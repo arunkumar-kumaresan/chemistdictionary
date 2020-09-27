@@ -32,6 +32,10 @@
         prepend-inner-icon="mdi-magnify"
         class="px-3 shrink"
         v-show="$vuetify.breakpoint.mdAndUp"
+        v-model="searchQuery"
+        @keyup="submitSearch"
+        @focus="showResult"
+        @focusout="hideResult"
       ></v-text-field>
       <v-spacer></v-spacer>
       <v-btn
@@ -42,6 +46,17 @@
           mdi-magnify
         </v-icon>
       </v-btn>
+      <div class="searchResult" v-show="isResult">
+        <div class="card">
+          <div class="card-content">
+            <nuxt-link  :to="article.path" v-for="article in articles" v-bind:key="article.slug" >
+              <div class="content" @click="hideResult">
+                {{ article.title }}
+              </div>
+            </nuxt-link>
+          </div>
+        </div>
+      </div>
 
       <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-top-transition">
         <v-card>
@@ -58,10 +73,18 @@
                 dense
                 label="Search"
                 v-show="$vuetify.breakpoint.smAndDown"
+                v-model="searchQuery"
+                @keyup="submitSearch"
+                @focus="showResult"
+                @focusout="hideResult"
               ></v-text-field>
           </v-toolbar>
           <v-list class="mx-auto">
-            Waiting to show search results!
+            <nuxt-link  :to="article.path" v-for="article in articles" v-bind:key="article.slug" >
+              <div class="content" @click="hideResult">
+                {{ article.title }}
+              </div>
+            </nuxt-link>
           </v-list>
         </v-card>
       </v-dialog>
@@ -70,15 +93,17 @@
 </template>
 
 <script>
+  const sanitizeHtml = require('sanitize-html');
+
   export default {
     name: "Navbar",
     data() {
       return {
+        searchQuery: '',
+        isResult: false,
+        articles: [],
         drawer: false,
         dialog: false,
-        notifications: false,
-        sound: true,
-        widgets: false,
         items: [
           {title: 'Home', icon: 'mdi-home', path: '/'},
           {title: 'Glossary', icon: 'mdi-bookshelf', path: '/Glossary'},
@@ -87,6 +112,33 @@
           {title: 'Blog', icon: 'mdi-bookshelf', path: '/Blog'},
           {title: 'About Us', icon: 'mdi-account-group', path: '/AboutUs'},
         ]
+      }
+    },
+    methods: {
+      submitSearch: async function () {
+        if (this.searchQuery.trim().length <= 2) {
+          this.isResult = false;
+          this.articles = [];
+        } else {
+          let sanitizedHTML = sanitizeHtml(this.searchQuery, {
+            allowedTags: [],
+            allowedAttributes: {}
+          });
+          const articles = await this.$content('Glossary')
+            .search('title', sanitizedHTML.trim()).fetch();
+
+          console.log(articles);
+          this.isResult = !!articles.length;
+          this.articles = articles;
+        }
+      },
+      hideResult: function () {
+        setTimeout(() => this.isResult = false, 200);
+      },
+      showResult: function () {
+        if (!this.isResult) {
+          this.submitSearch();
+        }
       }
     }
   }

@@ -52,7 +52,7 @@
         >
           <v-card-text>
             <div>Word of the Day</div>
-            <p class="display-1 text--primary">
+            <p class="headline text--primary">
               {{wordToday.title}}
             </p>
             <p>Definition</p>
@@ -77,7 +77,7 @@
         >
           <v-card-text>
             <div>Element of the Day</div>
-            <p class="display-1 text--primary">
+            <p class="headline text--primary">
               {{elementToday.title}}
             </p>
             <div class="text--primary">
@@ -161,21 +161,7 @@
           title: "Hydrogen",
           excerpt: "An acid is a molecule or ion capable of donating a proton (hydrogen ion H+) or, alternatively, capable of forming a covalent bond with an electron pair.",
           path: "/Element/hydrogen"
-        },
-        items: [
-          {
-            color: '#1F7087',
-            src: 'https://cdn.vuetifyjs.com/images/cards/foster.jpg',
-            title: 'Supermodel',
-            artist: 'Foster the People',
-          },
-          {
-            color: '#952175',
-            src: 'https://cdn.vuetifyjs.com/images/cards/halcyon.png',
-            title: 'Halcyon Days',
-            artist: 'Ellie Goulding',
-          },
-        ],
+        }
       }
     }
   }
